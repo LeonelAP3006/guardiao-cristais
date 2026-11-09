@@ -10,7 +10,7 @@ import pygame
 
 from src.core.game import Game
 from src.engine.window import Window
-from src.scenes.demo_scene import DemoScene
+from src.scenes.play_scene import PlayScene
 
 
 def main() -> int:
@@ -20,11 +20,9 @@ def main() -> int:
 
     pygame.init()
     try:
-        window = Window()                 # 1.º a janela: cria o contexto OpenGL
-        cena = DemoScene()                # 2.º recursos (texturas exigem contexto)
-        game = Game(window, cena)
-        cena.game = game                  # a cena precisa do jogo para sair/viewport
-        game.executar()
+        window = Window()          # 1.º a janela: cria o contexto OpenGL
+        game = Game(window)        # 2.º os serviços (input, assets, cenas)
+        game.executar(PlayScene()) # 3.º a cena inicial (no Bloco 4: MenuScene)
     finally:
         pygame.quit()
     return 0
