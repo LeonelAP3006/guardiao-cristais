@@ -28,3 +28,6 @@ desktop.ini
 *.mp4
 *.mkv
 docs/relatorio/*.pdf
+
+# Ranking criado ao jogar
+dados/

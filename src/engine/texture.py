@@ -10,7 +10,7 @@ Fluxo de uma imagem até ao ecrã:
 
 import pygame
 from OpenGL.GL import (
-    GL_CLAMP_TO_EDGE, GL_NEAREST, GL_RGBA, GL_TEXTURE_2D,
+    GL_CLAMP_TO_EDGE, GL_LINEAR, GL_NEAREST, GL_REPEAT, GL_RGBA, GL_TEXTURE_2D,
     GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER, GL_TEXTURE_WRAP_S,
     GL_TEXTURE_WRAP_T, GL_UNPACK_ALIGNMENT, GL_UNSIGNED_BYTE,
     glBindTexture, glDeleteTextures, glGenTextures, glPixelStorei,
@@ -30,20 +30,28 @@ def _superficie_para_bytes(surface: pygame.Surface) -> bytes:
 class Texture:
     """Uma imagem carregada na placa gráfica, identificada por um id OpenGL."""
 
-    def __init__(self, surface: pygame.Surface):
+    def __init__(self, surface: pygame.Surface, repetir: bool = False,
+                 suave: bool = False):
         self.largura, self.altura = surface.get_size()
+        self.repetir = repetir
         dados = _superficie_para_bytes(surface)
 
         self.id = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, self.id)
 
-        # GL_NEAREST: ao ampliar, cada píxel vira um bloco nítido (pixel art).
-        # GL_LINEAR suavizaria e deixaria os sprites desfocados.
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-        # CLAMP_TO_EDGE evita que a borda de um frame "puxe" píxeis do vizinho.
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
+        # Filtro usado quando a textura é desenhada maior/menor que o original:
+        #  - GL_NEAREST: cada píxel vira um bloco nítido (ideal para pixel art).
+        #  - GL_LINEAR : mistura píxeis vizinhos, suave (melhor para texto).
+        filtro = GL_LINEAR if suave else GL_NEAREST
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtro)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtro)
+        # Modo de "embrulho" quando u ou v saem de 0..1:
+        #  - CLAMP_TO_EDGE (sprites): evita puxar píxeis da borda oposta.
+        #  - REPEAT (paredes, chão): u=0..4 desenha a imagem 4 vezes seguidas,
+        #    ou seja, um padrão em mosaico com uma só textura pequena.
+        modo = GL_REPEAT if repetir else GL_CLAMP_TO_EDGE
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, modo)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, modo)
 
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, self.largura, self.altura, 0,
@@ -51,10 +59,10 @@ class Texture:
         glBindTexture(GL_TEXTURE_2D, 0)
 
     @classmethod
-    def carregar(cls, caminho: str) -> "Texture":
+    def carregar(cls, caminho: str, repetir: bool = False) -> "Texture":
         # Não usamos convert_alpha(): com uma janela OPENGL não existe
         # superfície de ecrã do Pygame para onde converter.
-        return cls(pygame.image.load(caminho))
+        return cls(pygame.image.load(caminho), repetir=repetir)
 
     def libertar(self) -> None:
         glDeleteTextures([self.id])

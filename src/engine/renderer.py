@@ -34,6 +34,22 @@ BRANCO: Cor = (1.0, 1.0, 1.0, 1.0)
 
 class Renderer:
 
+    # -- câmara ------------------------------------------------------------------
+    @staticmethod
+    def inicio_deslocamento(dx: float, dy: float) -> None:
+        """Translada TUDO o que for desenhado a seguir (até fim_deslocamento).
+
+        Usado no tremor de ecrã ao levar dano: em vez de mexer na posição
+        de cada objecto, aplicamos UMA translação à cena inteira. É o mesmo
+        glTranslate dos objectos, mas um nível acima na pilha de matrizes.
+        """
+        glPushMatrix()
+        glTranslatef(dx, dy, 0.0)
+
+    @staticmethod
+    def fim_deslocamento() -> None:
+        glPopMatrix()
+
     # -- transformação ---------------------------------------------------------
     @staticmethod
     def _transformar(cx: float, cy: float, angulo: float,
