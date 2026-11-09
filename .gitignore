@@ -1,0 +1,30 @@
+# Ambiente virtual (cada pessoa cria o seu; nunca vai para o GitHub)
+.venv/
+venv/
+
+# Cache do Python
+__pycache__/
+*.py[cod]
+
+# Testes
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Base de dados do ranking (é gerada ao jogar; cada PC tem a sua)
+*.db
+*.sqlite3
+
+# Editores e sistema
+.vscode/*
+!.vscode/extensions.json
+.idea/
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Entregáveis pesados (enviados por outro meio, não pelo Git)
+*.zip
+*.mp4
+*.mkv
+docs/relatorio/*.pdf
