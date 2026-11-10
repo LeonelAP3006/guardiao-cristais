@@ -1,12 +1,3 @@
-# Guardião dos Cristais
-
-Jogo 2D de sobrevivência top-down desenvolvido em **Python + OpenGL** para o
-Trabalho Prático Final de Computação Gráfica (Grupo 2 — Jogo 2D com Inteligência Artificial).
-
-> Estado: **Bloco 4 concluído — todas as funcionalidades obrigatórias implementadas.**
-> Menu principal, sentinelas com IA, cristais e pontuação, vidas, obstáculos
-> animados, power-ups, ranking em SQLite, música, efeitos sonoros e partículas.
-
 ## Como executar (Windows / PowerShell)
 
 ```powershell
